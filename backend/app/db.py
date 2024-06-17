@@ -47,3 +47,11 @@ def create_feedback(submission_id: int, score: int, feedback: str, model: str="g
     (id, ) = row if row else None
     con.commit()
     return id
+
+def create_user(name: str, email: str, phone: str) -> int:
+    cur.execute(f"INSERT INTO users (name, email, phone) VALUES (?, ?, ?) RETURNING id", (name, email, phone))
+    row = cur.fetchone()
+    (id, ) = row if row else None
+    con.commit()
+    return id
+    

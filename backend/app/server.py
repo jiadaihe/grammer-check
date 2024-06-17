@@ -6,7 +6,7 @@ import os
 import re
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
-from app.db import create_feedback, create_submission, get_submission_transcript
+from app.db import create_feedback, create_submission, create_user, get_submission_transcript
 
 load_dotenv()
 
@@ -32,6 +32,11 @@ async def transcribe_audio_with_whisper(file_path):
     return result["text"]
 
 
+@app.post("/users")
+async def submit_user(name: str, email: str, phone: str):
+    create_user(name, email, phone)
+
+
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
@@ -39,9 +44,6 @@ async def upload_file(file: UploadFile = File(...)):
         buffer.write(await file.read())
     transcript = await transcribe_audio_with_whisper(filepath)
     submission_id = create_submission(filepath, transcript.strip())
-    print('submission id', submission_id)
-    # result = await get_feedback(submission_id)
-    print('transcripe in upload', transcript)
     return JSONResponse(content={"message": "File uploaded successfully", "submissionId": submission_id})
 
 

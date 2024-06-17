@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useReactMediaRecorder } from 'react-media-recorder';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 
 const TaskPage: React.FC = () => {
   const { startRecording, stopRecording, mediaBlobUrl, clearBlobUrl, status, error } = useReactMediaRecorder({ audio: true });
   const navigate = useNavigate();
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [submissionId, setSubmissionId] = useState<number>(0);
+  const { userId } = useParams<{ userId: string }>();
+  console.log({userId: userId})
 
   const handleStartRecording = () => {
     clearBlobUrl(); // Clear previous recording
@@ -21,22 +21,6 @@ const TaskPage: React.FC = () => {
     console.log({mediaBlobUrl: mediaBlobUrl})
   };
 
-  const handlePlayRecording = () => {
-    // Implement audio playback logic here
-    console.log('Play recording');
-  };
-
-  const handleReRecord = () => {
-    // Reset the audioBlob state
-    setAudioBlob(null);
-  };
-
-  const handleSubmit = () => {
-    // Send the audioBlob to the backend for processing
-    console.log('Submitting audio:', audioBlob);
-    // Implement navigation to FeedbackPage here
-  };
-
   const handleUpload = async () => {
     if (mediaBlobUrl) {
       try {
@@ -47,10 +31,11 @@ const TaskPage: React.FC = () => {
         // Create a FormData object and append the blob
         const formData = new FormData();
         formData.append('file', blob, `${filename}.wav`);
+        formData.append('userid', userId);
 
         // Send the formData to the backend
         console.log('sending to backend')
-        const response = await fetch('http://localhost:8000/upload', {
+        const response = await fetch('http://localhost:8000/audio/upload', {
           method: 'POST',
           body: formData,
           headers: {},
@@ -58,8 +43,7 @@ const TaskPage: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json()
-          setSubmissionId(data.submissionId)
-          navigate(`/feedback/${data.submissionId}`);
+          navigate(`/audio/feedback/${data.submissionId}`);
           console.log('File uploaded successfully');
         } else {
           console.error('File upload failed');

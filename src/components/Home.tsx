@@ -1,33 +1,54 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-interface CandidateDetails {
-  name: string;
-  email: string;
-  phone: string;
+interface User {
+  id: number | null
+  name: string
+  email: string
+  phone: string
 }
 
 const HomePage: React.FC = () => {
-  const [candidateDetails, setCandidateDetails] = useState<CandidateDetails>({
+  const [user, setUser] = useState<User>({
+    id: null,
     name: '',
     email: '',
     phone: '',
   });
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Save the candidate details
-    console.log('Name:', candidateDetails.name);
-    console.log('Email:', candidateDetails.email);
-    console.log('Phone:', candidateDetails.phone);
-    // Navigate to the Task Page
-    navigate('/task');
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault();
+      const response = await fetch('http://localhost:8000/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setUser((prevUser) => ({
+        ...prevUser,
+        id: data.userId,
+      }));
+      // Navigate to the Task Page
+      navigate(`/task/${data.userId}`);
+    } catch (error) {
+      console.error('Error submitting user:', error);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setCandidateDetails((prevDetails) => ({
+    setUser((prevDetails) => ({
       ...prevDetails,
       [name]: value,
     }));
@@ -43,7 +64,7 @@ const HomePage: React.FC = () => {
             type="text"
             id="name"
             name="name"
-            value={candidateDetails.name}
+            value={user.name}
             onChange={handleInputChange}
             required
           />
@@ -54,7 +75,7 @@ const HomePage: React.FC = () => {
             type="email"
             id="email"
             name="email"
-            value={candidateDetails.email}
+            value={user.email}
             onChange={handleInputChange}
             required
           />
@@ -65,9 +86,8 @@ const HomePage: React.FC = () => {
             type="tel"
             id="phone"
             name="phone"
-            value={candidateDetails.phone}
+            value={user.phone}
             onChange={handleInputChange}
-            required
           />
         </div>
         <button type="submit">Start Simulation</button>

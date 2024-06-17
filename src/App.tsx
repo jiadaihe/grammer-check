@@ -9,7 +9,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/task" element={<TaskPage />} />
+        <Route path="/task/:userId" element={<TaskPage />} />
         <Route path="/feedback/:submissionId" element={<FeedbackPage />} />
       </Routes>
     </BrowserRouter>

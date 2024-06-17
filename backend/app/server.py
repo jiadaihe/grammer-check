@@ -40,7 +40,7 @@ async def submit_user(name: str = Form(...), email: str = Form(...), phone: str 
     return JSONResponse(content={"userId": userid})
 
 @app.post("/audio/upload")
-async def upload_file(userid: str, file: UploadFile = File(...)):
+async def upload_file(userid: str = Form(...), file: UploadFile = File(...)):
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
     with open(filepath, "wb") as buffer:
         buffer.write(await file.read())
@@ -74,5 +74,4 @@ async def get_feedback(submission_id: int):
 
 
 if __name__ == '__main__':
-    
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import { useReactMediaRecorder } from 'react-media-recorder';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 
-const TaskPage: React.FC = () => {
-  const { startRecording, stopRecording, mediaBlobUrl, clearBlobUrl, status, error } = useReactMediaRecorder({ audio: true });
+const AudioRecorder: React.FC = () => {
+  const [isRecording, setIsRecording] = useState(false);
+  const { startRecording, stopRecording, mediaBlobUrl, clearBlobUrl, error } = useReactMediaRecorder({ audio: true });
   const navigate = useNavigate();
-  const { userId } = useParams<{ userId: string }>();
-  console.log({userId: userId})
-
+  const state = useLocation().state as { userId: number };
+  const userId = state.userId;
+  
   const handleStartRecording = () => {
     clearBlobUrl(); // Clear previous recording
     startRecording();
-    console.log({mediaBlobUrl: mediaBlobUrl})
-
+    setIsRecording(true);
   };
 
   const handleStopRecording = () => {
     stopRecording();
-    console.log({mediaBlobUrl: mediaBlobUrl})
+    setIsRecording(false);
   };
 
   const handleUpload = async () => {
@@ -31,7 +31,7 @@ const TaskPage: React.FC = () => {
         // Create a FormData object and append the blob
         const formData = new FormData();
         formData.append('file', blob, `${filename}.wav`);
-        formData.append('userid', userId);
+        formData.append('userid', userId.toString());
 
         // Send the formData to the backend
         console.log('sending to backend')
@@ -43,7 +43,7 @@ const TaskPage: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json()
-          navigate(`/audio/feedback/${data.submissionId}`);
+          navigate(`/feedback/${data.submissionId}`);
           console.log('File uploaded successfully');
         } else {
           console.error('File upload failed');
@@ -56,15 +56,13 @@ const TaskPage: React.FC = () => {
 
   return (
     <div>
-      <h1>Simulation Task</h1>
-      <p>Record an audio selling a healthcare service</p>
-      <div>
-        <button onClick={handleStartRecording} disabled={status === "recording"}>Start Recording</button>
-        <button onClick={handleStopRecording} disabled={status !== "recording"}>Stop Recording</button>
+        <h1>Simulation Task</h1>
+        <p>Record an audio selling a healthcare service</p>
+        <button onClick={handleStartRecording} disabled={isRecording}>Start Recording</button>
+        <button onClick={handleStopRecording} disabled={!isRecording}>Stop Recording</button>
         <button onClick={clearBlobUrl} disabled={!mediaBlobUrl}>Re-record</button>
         <button onClick={() => navigate('/')}>Back to Home</button>
-      </div>
-        {status === "recording" && <p>Recording in progress...</p>}
+        {isRecording && <p>Recording in progress...</p>}
         {mediaBlobUrl && (
             <div>
             <h2>Recorded Audio</h2>
@@ -80,4 +78,4 @@ const TaskPage: React.FC = () => {
   );
 };
 
-export default TaskPage;
+export default AudioRecorder;

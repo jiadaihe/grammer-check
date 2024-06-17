@@ -31,12 +31,13 @@ cur.execute("""
         score int,
         feedback text,
         model text not null,
-        foreign key (submissionid) references submissions(id)
+        foreign key (submissionid) references submissions(id),
+        unique (submissionid, model)
     );""")
 con.commit()
 
 def create_submission(userid: int, audio_url: str, transcript: str) -> int:
-    cur.execute("INSERT INTO submissions (userid, audio_url, transcript) VALUES (?, ?) RETURNING id", (userid, audio_url, transcript))
+    cur.execute("INSERT INTO submissions (userid, audio_url, transcript) VALUES (?, ?, ?) RETURNING id", (userid, audio_url, transcript))
     row = cur.fetchone()
     (id, ) = row if row else None
     con.commit()

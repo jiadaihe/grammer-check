@@ -40,7 +40,7 @@ const HomePage: React.FC = () => {
         id: data.userId,
       }));
       // Navigate to the Task Page
-      navigate(`/task/${data.userId}`);
+      navigate('/task', { state: { userId: data.userId } });
     } catch (error) {
       console.error('Error submitting user:', error);
     }

@@ -11,10 +11,9 @@ const FeedbackPage: React.FC = () => {
   const [feedback, setFeedback] = useState<FeedbackData | null>(null);
 
   useEffect(() => {
-    // Fetch the score and feedback from the backend
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/feedback/${submissionId}`);
+        const response = await fetch(`http://localhost:8000/audio/feedback/${submissionId}`);
         const data = await response.json();
         setFeedback(data);
       } catch (error) {

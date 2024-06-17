@@ -39,7 +39,9 @@ con.commit()
 def create_submission(userid: int, audio_url: str, transcript: str) -> int:
     cur.execute("INSERT INTO submissions (userid, audio_url, transcript) VALUES (?, ?, ?) RETURNING id", (userid, audio_url, transcript))
     row = cur.fetchone()
-    (id, ) = row if row else None
+    if row is None:
+        raise ValueError("Cannot insert into submissions table.")
+    id = row[0]
     con.commit()
     return id
 
@@ -52,22 +54,43 @@ def get_submission_transcript(id: int) -> str:
 def create_feedback(submission_id: int, score: int, feedback: str, model: str="gpt-3.5-turbo") -> int:
     cur.execute(f"INSERT INTO feedbacks (submissionid, score, feedback, model) VALUES (?, ?, ?, ?) RETURNING id", (submission_id, score, feedback, model))
     row = cur.fetchone()
-    (id, ) = row if row else None
-    con.commit()
+    if row is None:
+        raise ValueError("Cannot insert into feedbacks table.")
+    id = row[0]
     return id
+
+def get_feedback(submission_id: int, model: str) -> tuple[int, str] | None:
+    """ If user not found, return None """
+    logger.info(f"Getting feedback for submission {submission_id} and model {model}")
+    row = cur.execute(f"SELECT score, feedback FROM feedbacks WHERE submissionid='{submission_id}' and model='{model}'").fetchone()
+    return row
+
+def delete_feedback(submission_id: int, model: str="gpt-3.5-turbo") -> int | None:
+    """ If user not found, return None """
+    logger.info(f"Deleting feedback with submissionid={submission_id} and model={model}")
+    cur.execute(f"DELETE FROM feedbacks WHERE submissionid={submission_id} and model='{model}'")
+    con.commit()
 
 def get_user(email: str) -> int | None:
     """ If user not found, return None """
     logger.info(f"Getting user {email}")
     row = cur.execute(f"SELECT id FROM users WHERE email='{email}'").fetchone()
-    (id, ) = row if row else None
-    return id
+    if row is None:
+        return None
+    return row[0]
+
+def delete_user(email: str) -> int | None:
+    """ If user not found, return None """
+    logger.info(f"Deleting user {email}")
+    cur.execute(f"DELETE FROM users WHERE email='{email}'")
+    con.commit()
 
 def create_user(name: str, email: str, phone: str) -> int:
     logger.info(f"Creating user {name}")
     cur.execute(f"INSERT INTO users (name, email, phone) VALUES (?, ?, ?) RETURNING id", (name, email, phone))
     row = cur.fetchone()
-    (id, ) = row if row else None
-    con.commit()
+    if row is None:
+        raise ValueError("Cannot insert into users table.")
+    id = row[0]
     return id
     

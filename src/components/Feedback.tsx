@@ -13,7 +13,7 @@ const FeedbackPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/audio/feedback/${submissionId}`);
+        const response = await fetch(`http://ec2-13-52-102-46.us-west-1.compute.amazonaws.com:8000/audio/feedback/${submissionId}`);
         const data = await response.json();
         setFeedback(data);
       } catch (error) {

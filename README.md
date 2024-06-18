@@ -12,9 +12,8 @@ sudo yum install -y openssl-devel bzip2-devel libffi-devel zlib-devel wget
 wget https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tgz
 tar xzf Python-3.12.0.tgz
 cd Python-3.12.0
-./configure --enable-optimizations
-make -j $(nproc)
-sudo make altinstall
+./configure --enable-optimizations --enable-loadable-sqlite-extensions
+make install
 ```
 - Install Poetry:
 ```

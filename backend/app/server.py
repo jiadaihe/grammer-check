@@ -17,7 +17,7 @@ load_dotenv()
 client = AsyncOpenAI()
 app = FastAPI()
 origins = [
-    "http://localhost:3000",  # React app
+    "http://ec2-13-52-102-46.us-west-1.compute.amazonaws.com:3000",  # React app
 ]
 app.add_middleware(
     CORSMiddleware,

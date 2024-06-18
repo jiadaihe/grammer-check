@@ -20,7 +20,7 @@ const HomePage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
-      const response = await fetch('http://localhost:8000/users', {
+      const response = await fetch('http://ec2-13-52-102-46.us-west-1.compute.amazonaws.com:8000/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

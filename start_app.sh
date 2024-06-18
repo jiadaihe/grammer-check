@@ -2,7 +2,7 @@
 
 # Start the frontend
 echo "Starting frontend..."
-nohup npm start > frontend.log 2>&1 &
+nohup npm start --host 0.0.0.0 > frontend.log 2>&1 &
 echo $! > frontend.pid  # Store frontend PID
 sleep 5
 

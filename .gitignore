@@ -25,5 +25,7 @@ yarn-error.log*
 .env
 __pycache__
 uploads
-take2ai.db
+take2ai.db*
 .pytest_cache
+
+*.log

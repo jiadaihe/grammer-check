@@ -9,5 +9,5 @@ sleep 5
 # Start the backend
 echo "Starting backend..."
 cd backend/app
-nohup uvicorn server:app --reload > backend.log 2>&1 &
+nohup uvicorn server:app --host 0.0.0.0 > backend.log 2>&1 &
 echo $! > backend.pid  # Store backend PID
